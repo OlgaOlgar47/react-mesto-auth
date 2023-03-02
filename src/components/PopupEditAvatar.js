@@ -8,7 +8,6 @@ function PopupEditAvatar({ isOpen, onClose }) {
       onClose={onClose}
       title="Обновить аватар"
       name="updateAvatar"
-      buttonText="Сохранить"
     >
       <label>
         <input

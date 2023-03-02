@@ -1,14 +1,20 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import api from "../utils/Api.js";
 import Card from "./Card.js";
 
-function Main({ onEditProfile, onAddPlace, onEditAvatar, onCardClick }) {
-  const [userName, setUserName] = React.useState("");
-  const [userDescription, setUserDescription] = React.useState("");
-  const [userAvatar, setUserAvatar] = React.useState("");
-  const [cards, setCards] = React.useState([]);
+function Main({
+  onEditProfile,
+  onAddPlace,
+  onEditAvatar,
+  onCardClick,
+  onDeleteClick,
+}) {
+  const [userName, setUserName] = useState("");
+  const [userDescription, setUserDescription] = useState("");
+  const [userAvatar, setUserAvatar] = useState("");
+  const [cards, setCards] = useState([]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     Promise.all([api.getUserData(), api.getInitialCards()])
       .then(([userData, initialCards]) => {
         setUserName(userData.name);
@@ -66,6 +72,7 @@ function Main({ onEditProfile, onAddPlace, onEditAvatar, onCardClick }) {
                   name={card.name}
                   link={card.link}
                   onCardClick={onCardClick}
+                  onDeleteClick={onDeleteClick}
                 />
               );
             })}
