@@ -1,10 +1,14 @@
 import React from "react";
 import PopupWithForm from "./PopupWithForm";
-import useValidation from "./useValidation";
+import useValidation from "../hooks/useValidation";
 
 function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
   const { values, errors, isValid, onChange, resetValidation } =
     useValidation();
+
+  React.useEffect(() => {
+    resetValidation(values, errors);
+  }, [isOpen]);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -12,7 +16,6 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
       name: values.name,
       link: values.link,
     });
-    resetValidation(values, errors);
   }
 
   return (

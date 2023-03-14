@@ -2,13 +2,17 @@ import React from "react";
 import { useEffect, useContext } from "react";
 import PopupWithForm from "./PopupWithForm";
 import CurrentUserContext from "../contexts/CurrentUserContext.js";
-import useValidation from "./useValidation";
+import useValidation from "../hooks/useValidation";
 
 function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
   const currentUser = useContext(CurrentUserContext);
 
   const { values, errors, onChange, setValues, resetValidation, isValid } =
     useValidation();
+
+  React.useEffect(() => {
+    resetValidation(values, errors);
+  }, [isOpen]);
 
   useEffect(() => {
     setValues({
@@ -24,8 +28,6 @@ function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
       name: values.name,
       about: values.about,
     });
-
-    resetValidation(values, errors);
   }
 
   return (

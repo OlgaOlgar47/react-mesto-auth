@@ -76,33 +76,47 @@ function App() {
       .then(() => {
         const updatedCards = cards.filter((i) => i._id !== cardId);
         setCards(updatedCards);
+        closeAllPopups();
       })
       .catch((error) => {
         console.log(error);
       });
-
-    closeAllPopups();
   };
 
   const handleUpdateUser = (data) => {
-    api.editUserData(data).then((res) => {
-      setCurrentUser(res);
-      closeAllPopups();
-    });
+    api
+      .editUserData(data)
+      .then((res) => {
+        setCurrentUser(res);
+        closeAllPopups();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const handleUpdateAvatar = (data) => {
-    api.changeAvatar(data).then((res) => {
-      setCurrentUser(res);
-      closeAllPopups();
-    });
+    api
+      .changeAvatar(data)
+      .then((res) => {
+        setCurrentUser(res);
+        closeAllPopups();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const handleAddPlaceSubmit = (data) => {
-    api.createCard(data).then((newCard) => {
-      setCards([newCard, ...cards]);
-      closeAllPopups();
-    });
+    api
+      .createCard(data)
+      .then((newCard) => {
+        setCards([newCard, ...cards]);
+        closeAllPopups();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   return (
