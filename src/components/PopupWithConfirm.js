@@ -1,7 +1,12 @@
 import React from "react";
 import PopupWithForm from "./PopupWithForm";
 
-function PopupWithConfirm({ isOpen, onClose }) {
+function PopupWithConfirm({ card, isOpen, onClose, onCardDelete }) {
+  function handleSubmit(e) {
+    e.preventDefault();
+    onCardDelete(card);
+  }
+
   return (
     <PopupWithForm
       className="popup__title_type_confirm"
@@ -10,6 +15,8 @@ function PopupWithConfirm({ isOpen, onClose }) {
       buttonText="Да"
       isOpen={isOpen}
       onClose={onClose}
+      onSubmit={handleSubmit}
+      isValid={true}
     ></PopupWithForm>
   );
 }

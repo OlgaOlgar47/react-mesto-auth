@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import api from "../utils/Api.js";
+import { useContext } from "react";
 import Card from "./Card.js";
+import CurrentUserContext from "../contexts/CurrentUserContext.js";
 
 function Main({
   onEditProfile,
@@ -8,24 +8,10 @@ function Main({
   onEditAvatar,
   onCardClick,
   onDeleteClick,
+  onCardLike,
+  cards,
 }) {
-  const [userName, setUserName] = useState("");
-  const [userDescription, setUserDescription] = useState("");
-  const [userAvatar, setUserAvatar] = useState("");
-  const [cards, setCards] = useState([]);
-
-  useEffect(() => {
-    Promise.all([api.getUserData(), api.getInitialCards()])
-      .then(([userData, initialCards]) => {
-        setUserName(userData.name);
-        setUserDescription(userData.about);
-        setUserAvatar(userData.avatar);
-        setCards(initialCards);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+  const currentUser = useContext(CurrentUserContext);
 
   return (
     <>
@@ -41,18 +27,18 @@ function Main({
               <div
                 className="profile__avatar"
                 alt="Аватарка"
-                style={{ backgroundImage: `url(${userAvatar})` }}
+                style={{ backgroundImage: `url(${currentUser.avatar})` }}
               />
             </button>
             <div className="profile__profile-info">
-              <h1 className="profile__name">{userName}</h1>
+              <h1 className="profile__name">{currentUser.name}</h1>
               <button
                 className="profile__edit-button"
                 type="button"
                 aria-label="Редактирование данных"
                 onClick={onEditProfile}
               ></button>
-              <p className="profile__profession">{userDescription}</p>
+              <p className="profile__profession">{currentUser.about}</p>
             </div>
           </div>
           <button
@@ -72,6 +58,7 @@ function Main({
                   name={card.name}
                   link={card.link}
                   onCardClick={onCardClick}
+                  onCardLike={onCardLike}
                   onDeleteClick={onDeleteClick}
                 />
               );
