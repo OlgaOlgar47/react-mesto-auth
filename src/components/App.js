@@ -1,38 +1,92 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import api from "../utils/Api.js";
 import Header from "./Header.js";
 import Main from "./Main.js";
-import Footer from "./Footer.js";
 import EditProfilePopup from "./EditProfilePopup.js";
 import EditAvatarPopup from "./EditAvatarPopup.js";
 import AddPlacePopup from "./AddPlacePopup.js";
 import PopupWithConfirm from "./PopupWithConfirm.js";
 import ImagePopup from "./ImagePopup.js";
 import CurrentUserContext from "../contexts/CurrentUserContext.js";
+import ProtectedRoute from "./ProtectedRoute.js";
+import Login from "./Login.js";
+import Register from "./Register.js";
+import InfoTooltip from "./InfoTooltip.js";
+import * as Auth from "./Auth.js";
 
 function App() {
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setEditAvatarPopupOpen] = useState(false);
   const [isConfirmPopupOpen, setConfirmPopupOpen] = useState(false);
+  const [isSuccessPopupOpen, setSuccessPopupOpen] = useState(false);
+  const [isFailPopupOpen, setFailPopupOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState({});
   const [currentUser, setCurrentUser] = useState("");
+  const [email, setEmail] = useState("");
   const [cards, setCards] = useState([]);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  const tokenCheck = useCallback(() => {
+    if (localStorage.getItem("token")) {
+      const token = localStorage.getItem("token");
+      if (token) {
+        Auth.getContent(token)
+          .then((res) => {
+            if (res) {
+              setEmail(res.data.email);
+              setLoggedIn(true);
+              navigate("/", { replace: true });
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+    }
+  }, [setEmail, setLoggedIn, navigate]);
 
   useEffect(() => {
-    Promise.all([api.getUserData(), api.getInitialCards()])
-      .then(([userData, initialCards]) => {
-        setCurrentUser(userData);
-        setCards(initialCards);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+    tokenCheck();
+  }, [tokenCheck]);
+
+  useEffect(() => {
+    if (loggedIn) {
+      Promise.all([api.getUserData(), api.getInitialCards()])
+        .then(([userData, initialCards]) => {
+          setCurrentUser(userData);
+          setCards(initialCards);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [loggedIn]);
+
+  const handleLogin = () => {
+    setLoggedIn(true);
+  };
+
+  const handleSignOut = () => {
+    localStorage.removeItem("token");
+    setCurrentUser(null);
+    setLoggedIn(false);
+    navigate("/sign-in", { replace: true });
+  };
 
   const handleConfirmPopupClick = (card) => {
     setSelectedCard(card._id);
     setConfirmPopupOpen("popup_opened");
+  };
+
+  const openPopupInfoSucces = () => {
+    setSuccessPopupOpen("popup_opened");
+  };
+
+  const openPopupInfoFail = () => {
+    setFailPopupOpen("popup__opened");
   };
 
   const handleEditAvatarClick = () => {
@@ -54,6 +108,8 @@ function App() {
     setEditAvatarPopupOpen(false);
     setEditProfilePopupOpen(false);
     setConfirmPopupOpen(false);
+    setSuccessPopupOpen(false);
+    setFailPopupOpen(false);
     setSelectedCard({});
   };
 
@@ -118,22 +174,70 @@ function App() {
         console.log(error);
       });
   };
+  const ProtectedMain = () => {
+    return (
+      <Main
+        onEditProfile={handleEditProfileClick}
+        onAddPlace={handleAddPlaceClick}
+        onEditAvatar={handleEditAvatarClick}
+        onDeleteClick={handleConfirmPopupClick}
+        onCardClick={handleCardClick}
+        onCardLike={handleCardLike}
+        cards={cards}
+      />
+    );
+  };
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="App">
         <div className="page">
-          <Header />
-          <Main
-            onEditProfile={handleEditProfileClick}
-            onAddPlace={handleAddPlaceClick}
-            onEditAvatar={handleEditAvatarClick}
-            onDeleteClick={handleConfirmPopupClick}
-            onCardClick={handleCardClick}
-            onCardLike={handleCardLike}
-            cards={cards}
+          <Header onSignOut={handleSignOut} loggedIn={loggedIn} email={email} />
+          <Routes>
+            <Route
+              path="/sign-up"
+              element={
+                <Register
+                  title="Регистрация"
+                  buttonText="Зарегистрироваться"
+                  openPopupInfo={openPopupInfoSucces}
+                />
+              }
+            ></Route>
+            <Route
+              path="/sign-in"
+              element={
+                <Login
+                  title="Вход"
+                  buttonText="Войти"
+                  handleLogin={handleLogin}
+                  openPopupInfo={openPopupInfoFail}
+                />
+              }
+            ></Route>
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute element={ProtectedMain} loggedIn={loggedIn} />
+              }
+            ></Route>
+          </Routes>
+          <InfoTooltip
+            name="infotooltip"
+            isOpen={isSuccessPopupOpen}
+            onClose={closeAllPopups}
+            imagePath="http://localhost:3000/static/media/success.1b6082f862eac35e2514.svg"
+            title="Вы успешно зарегистрировались!"
           />
-          <Footer />
+          <InfoTooltip
+            name="infotooltip"
+            isOpen={isFailPopupOpen}
+            onClose={closeAllPopups}
+            imagePath="http://localhost:3000/static/media/fail.df8eddf661ff88f2d0ef.svg"
+            title="Что-то пошло не так!
+             Попробуйте ещё раз."
+          />
+
           <EditProfilePopup
             isOpen={isEditProfilePopupOpen}
             onClose={closeAllPopups}
