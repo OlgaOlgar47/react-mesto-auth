@@ -10,10 +10,11 @@ function InfoTooltip(props) {
           type="button"
           onClick={onClose}
         ></button>
-        <div
+        <img
           className="authorization__infotooltip-image"
-          style={{ backgroundImage: `url(${imagePath})` }}
-        ></div>
+          alt={name}
+          src={imagePath}
+        ></img>
         <h2 className="popup__title popup__title_type_success">{title}</h2>
       </div>
     </div>

@@ -14,6 +14,8 @@ import Login from "./Login.js";
 import Register from "./Register.js";
 import InfoTooltip from "./InfoTooltip.js";
 import * as Auth from "./Auth.js";
+import success from "../images/success.svg";
+import fail from "../images/fail.svg";
 
 function App() {
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] = useState(false);
@@ -226,14 +228,14 @@ function App() {
             name="infotooltip"
             isOpen={isSuccessPopupOpen}
             onClose={closeAllPopups}
-            imagePath="http://localhost:3000/static/media/success.1b6082f862eac35e2514.svg"
+            imagePath={success}
             title="Вы успешно зарегистрировались!"
           />
           <InfoTooltip
             name="infotooltip"
             isOpen={isFailPopupOpen}
             onClose={closeAllPopups}
-            imagePath="http://localhost:3000/static/media/fail.df8eddf661ff88f2d0ef.svg"
+            imagePath={fail}
             title="Что-то пошло не так!
              Попробуйте ещё раз."
           />
