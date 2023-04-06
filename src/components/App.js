@@ -16,6 +16,7 @@ import InfoTooltip from "./InfoTooltip.js";
 import * as Auth from "./Auth.js";
 import success from "../images/success.svg";
 import fail from "../images/fail.svg";
+import useValidation from "../hooks/useValidation";
 
 function App() {
   const [isEditProfilePopupOpen, setEditProfilePopupOpen] = useState(false);
@@ -29,7 +30,40 @@ function App() {
   const [email, setEmail] = useState("");
   const [cards, setCards] = useState([]);
   const [loggedIn, setLoggedIn] = useState(false);
+  const { values, setValues, errors, onChange } = useValidation();
   const navigate = useNavigate();
+
+  const onRegister = (e) => {
+    e.preventDefault();
+    Auth.register(values.email, values.password)
+      .then((res) => {
+        openPopupInfoSucces();
+        navigate("/sign-in", { replace: true });
+      })
+      .catch((err) => {
+        openPopupInfoFail();
+        console.log(err);
+      });
+  };
+
+  const onLogin = (e) => {
+    e.preventDefault();
+    if (!values.email || !values.password) {
+      return;
+    }
+    Auth.authorize(values.email, values.password)
+      .then((data) => {
+        if (data.token) {
+          setValues({ email: "", password: "" });
+          handleLogin();
+          navigate("/", { replace: true });
+        }
+      })
+      .catch((err) => {
+        openPopupInfoFail();
+        console.log(err);
+      });
+  };
 
   const tokenCheck = useCallback(() => {
     if (localStorage.getItem("token")) {
@@ -200,9 +234,10 @@ function App() {
               path="/sign-up"
               element={
                 <Register
-                  title="Регистрация"
-                  buttonText="Зарегистрироваться"
-                  openPopupInfo={openPopupInfoSucces}
+                  onRegister={onRegister}
+                  values={values}
+                  errors={errors}
+                  onChange={onChange}
                 />
               }
             ></Route>
@@ -210,10 +245,10 @@ function App() {
               path="/sign-in"
               element={
                 <Login
-                  title="Вход"
-                  buttonText="Войти"
-                  handleLogin={handleLogin}
-                  openPopupInfo={openPopupInfoFail}
+                  onLogin={onLogin}
+                  errors={errors}
+                  values={values}
+                  onChange={onChange}
                 />
               }
             ></Route>
