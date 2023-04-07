@@ -8,7 +8,7 @@ function Login(props) {
     <AuthForm
       title="Вход"
       buttonText="Войти"
-      onLogin={onLogin}
+      onSubmit={onLogin}
       errors={errors}
       values={values}
       onChange={onChange}

@@ -5,7 +5,7 @@ function AuthForm(props) {
     name,
     buttonText,
     title,
-    onLogin,
+    onSubmit,
     values,
     errors,
     onChange,
@@ -15,7 +15,12 @@ function AuthForm(props) {
   return (
     <div className="authorization">
       <div className="popup__container popup__container_type_auth">
-        <form className="popup__form" name={name} onSubmit={onLogin} noValidate>
+        <form
+          className="popup__form"
+          name={name}
+          onSubmit={onSubmit}
+          noValidate
+        >
           <h2 className="popup__title popup__title_type_auth">{title}</h2>
           <label>
             <input

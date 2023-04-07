@@ -9,7 +9,7 @@ function Register(props) {
     <AuthForm
       title="Регистрация"
       buttonText="Зарегистрироваться"
-      onRegister={onRegister}
+      onSubmit={onRegister}
       values={values}
       errors={errors}
       onChange={onChange}
